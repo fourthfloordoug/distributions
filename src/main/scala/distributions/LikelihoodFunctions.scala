@@ -11,12 +11,12 @@ object LikelihoodFunctions{
     return (normalization * scala.math.exp(exponent))
   }
 
-  def calculateGaussianMixtureDensity(parameters: GaussianMixtureParameters,point: DenseVector[Double]) : Double = {
+  def calculateGaussianMixtureDensity(mixtureParameters: GaussianMixtureParameters,point: DenseVector[Double]) : Double = {
 
-    // val componentLikelihoods = parameters.componentParams.map(component => calcualteGaussianDensity(component,point))
-    // val weightedLikelihoods = (parameters.weights, componentLikelihoods).zipped map (_ + _)
-    // return weightedLikelihoods.sum
-    return 0.0
+    val componentDensities = mixtureParameters.componentParams.map(component => LikelihoodFunctions.calculateGaussianDensity(component,point))
+    val weightedDensities = (mixtureParameters.weights.zip(componentDensities)).map(weightAndDensity => weightAndDensity._1 * weightAndDensity._2)
+
+    return weightedDensities.sum
   }
 
   def calculateVonMisesDensity(parameters: VonMisesParameters,point: DenseVector[Double]): Double = {
