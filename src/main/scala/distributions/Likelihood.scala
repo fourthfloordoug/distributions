@@ -17,6 +17,11 @@ object Likelihood {
     def getLikelihood(t: GaussianMixture, x: Double) = 1
   }
 
+  implicit object GaussianComponentLikelihood extends Likelihood[GaussianComponent] {
+
+    def getLikelihood(t: GaussianComponent,x: Double) = 6
+  }
+
   implicit object vonMisesLikelihood extends Likelihood[VonMises] {
 
     def getLikelihood(t: VonMises, x: Double) = 2
