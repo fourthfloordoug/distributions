@@ -4,9 +4,7 @@ import akka.actor.Actor
 import akka.actor.Props
 import akka.event.Logging
 
-import distributions.Distribution.GaussianMixture
-import distributions.Distribution.Gaussian
-import distributions.Distribution.GaussianComponent
+import distributions.Distribution._
 
 case class ProcessGaussianMsg(component: GaussianComponent, x: Double)
 case class GaussianProcessedMsg(likelihood: Double)
@@ -17,7 +15,7 @@ class GaussianActor extends Actor {
 
     case ProcessGaussianMsg(component, x) => {
 
-      val likelihood = component.weight * calculateLikelihood(gaussian,x)
+      val likelihood = component.weight * calculateLikelihood(component.gaussian,x)
       sender ! GaussianProcessedMsg(likelihood)
     }
     case _ => println("Unrecognized message");

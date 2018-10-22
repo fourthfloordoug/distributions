@@ -1,6 +1,7 @@
 package distributions
 
 import akka.actor.Actor
+import akka.actor.ActorRef
 import akka.actor.Props
 import akka.event.Logging
 
@@ -13,7 +14,7 @@ case class StartProcessGMMMsg()
 class GMMLikelihoodActor(gmm: GaussianMixture, x: Double) extends Actor {
 
   private var running = false
-  private var totalLikelihood = 0
+  private var totalLikelihood = 0.0
   private var compsProcessed = 0
   private var totalComps = 0
   private var distributionSender: Option[ActorRef] = None
@@ -25,18 +26,18 @@ class GMMLikelihoodActor(gmm: GaussianMixture, x: Double) extends Actor {
         println("Warning: duplicate start message")
       } else {
         running = true
-        distSender = Some(sender)
-        GaussianMixture.components.foreach {
-          context.actorOf(Pops[GaussianActor]) ! ProcessGaussianMsg(gmm, x)
+        distributionSender = Some(sender)
+        gmm.components.foreach { component =>
+          context.actorOf(Props[GaussianActor]) ! ProcessGaussianMsg(component, x)
           totalComps += 1 }
       }
     }
     case GaussianProcessedMsg(componentLikelihood) => {
 
-      totalLikelihood += GaussianComponentLikelihood
+      totalLikelihood += componentLikelihood
       compsProcessed += 1
       if (compsProcessed == totalComps) {
-        distSender.map(_ ! result)
+        distributionSender.map(_ ! totalLikelihood)
       }
     }
     case _ => println("msg not recognized")
