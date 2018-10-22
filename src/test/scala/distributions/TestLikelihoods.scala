@@ -4,7 +4,7 @@ import breeze.linalg._
 
 class SetSpec extends FlatSpec {
 
-  val mean0 = DenseVector.zeros[Double](3)
+  /*val mean0 = DenseVector.zeros[Double](3)
   val cov0 = DenseMatrix.zeros[Double](3,3)
   cov0(0,0) = 1
   cov0(1,1) = 1
@@ -46,7 +46,7 @@ class SetSpec extends FlatSpec {
   println()
 
   val mixtureLikelihood = LikelihoodFunctions.calculateGaussianMixtureDensity(mixture0,point0)
-  println(mixtureLikelihood)
+  println(mixtureLikelihood) */
 
   // "An empty Set" should "have size 0" in {
   //   assert(Set.empty.size == 0)
