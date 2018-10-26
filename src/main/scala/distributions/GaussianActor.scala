@@ -9,7 +9,7 @@ import distributions.Distribution._
 case class ProcessGaussianMsg(component: GaussianComponent, x: Double)
 case class GaussianProcessedMsg(likelihood: Double)
 
-class GaussianActor extends Actor {
+/* class GaussianActor extends Actor {
 
   def receive = {
 
@@ -20,4 +20,4 @@ class GaussianActor extends Actor {
     }
     case _ => println("Unrecognized message");
   }
-}
+} */

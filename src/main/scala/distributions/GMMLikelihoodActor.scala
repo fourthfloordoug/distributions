@@ -11,7 +11,7 @@ import distributions.Distribution.GaussianComponent
 
 case class StartProcessGMMMsg()
 
-class GMMLikelihoodActor(gmm: GaussianMixture, x: Double) extends Actor {
+/*class GMMLikelihoodActor(gmm: GaussianMixture, x: Double) extends Actor {
 
   private var running = false
   private var totalLikelihood = 0.0
@@ -22,6 +22,7 @@ class GMMLikelihoodActor(gmm: GaussianMixture, x: Double) extends Actor {
   def receive = {
 
     case StartProcessGMMMsg() => {
+
       if(running) {
         println("Warning: duplicate start message")
       } else {
@@ -44,4 +45,4 @@ class GMMLikelihoodActor(gmm: GaussianMixture, x: Double) extends Actor {
 
 
   }
-}
+} */

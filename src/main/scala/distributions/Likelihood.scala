@@ -1,17 +1,36 @@
 package distributions
 
+import akka.actor.Actor
+import akka.actor.ActorRef
+import akka.actor.ActorSystem
+import akka.actor.Props
+import akka.event.Logging
+import akka.util.Timeout
+import scala.concurrent.duration._
+import scala.concurrent.Future
+import scala.concurrent.Await
+import akka.pattern.ask
+import akka.dispatch.ExecutionContexts._
+
 import distributions.Distribution._
 
 import cern.jet.math.Bessel
 
+import scala.util.Failure
+import scala.util.Success
+
+
 trait Likelihood[T] {
-  def getLikelihood(t: T, x: Double): Double
+  def getLikelihood(t: T, x: Double): Future[Double]
 }
 
 object Likelihood {
 
+  implicit val ec = global
+
   implicit object GaussianLikelihood extends Likelihood[Gaussian] {
-    def getLikelihood(t: Gaussian, x: Double): Double = {
+
+    def getLikelihood(t: Gaussian, x: Double): Future[Double] = Future{
 
       val meanCentered = x - 1.0 * t.mean
       val exponent = (meanCentered * meanCentered / t.variance) * -0.5
@@ -20,22 +39,26 @@ object Likelihood {
     }
   }
 
-  implicit object GaussianMixtureLikelihood extends Likelihood[GaussianMixture] {
-
-    def getLikelihood(t: GaussianMixture, x: Double): Double = 1
-  }
-
   implicit object GaussianComponentLikelihood extends Likelihood[GaussianComponent] {
 
-    def getLikelihood(t: GaussianComponent,x: Double): Double = {
+    def getLikelihood(t: GaussianComponent,x: Double): Future[Double] =
 
-      t.weight*calculateLikelihood(t.gaussian,x)
+
+      calculateLikelihood(t.gaussian,x).map(likelihood => t.weight*likelihood)
+  }
+
+
+  implicit object GaussianMixtureLikelihood extends Likelihood[GaussianMixture] {
+
+    def getLikelihood(t: GaussianMixture, x: Double): Future[Double] = {
+
+      Future.sequence(t.components.map(component => calculateLikelihood(component,x))).map(_.sum)
     }
   }
 
   implicit object vonMisesLikelihood extends Likelihood[VonMises] {
 
-    def getLikelihood(t: VonMises, x: Double): Double = {
+    def getLikelihood(t: VonMises, x: Double): Future[Double] = Future {
 
       val kappaBessel = Bessel.i0(t.kappa)
       val denom = 2.0 * math.Pi * kappaBessel
@@ -48,7 +71,7 @@ object Likelihood {
 
   implicit object studentTLikelihood extends Likelihood[StudentT] {
 
-    def getLikelihood(t: StudentT, x: Double): Double = {
+    def getLikelihood(t: StudentT, x: Double): Future[Double] = Future{
 
       val nuPlus1Over2 = (t.nu + 1.0)/2.0
       val nuOver2 = t.nu / 2.0
