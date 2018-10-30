@@ -63,7 +63,7 @@ object Likelihood {
       val kappaBessel = Bessel.i0(t.kappa)
       val denom = 2.0 * math.Pi * kappaBessel
 
-      val exponent = t.kappa * (x - t.mu)
+      val exponent = t.kappa * math.cos(x - t.mu)
 
       math.exp(exponent) / denom
     }
